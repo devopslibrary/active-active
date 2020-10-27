@@ -77,10 +77,10 @@ module "ohio-vpc" {
 
 # Set up peering connection from Virginia --> Ohio
 resource "aws_vpc_peering_connection" "virginia-to-ohio" {
-  provider      = aws.virginia
-  peer_vpc_id   = module.ohio-vpc.vpc_id
-  vpc_id        = module.virginia-vpc.vpc_id
-  peer_region   = "us-east-2" # Ohio
+  provider    = aws.virginia
+  peer_vpc_id = module.ohio-vpc.vpc_id
+  vpc_id      = module.virginia-vpc.vpc_id
+  peer_region = "us-east-2" # Ohio
 }
 
 # Ohio will be nice and accept Virginia's invitation <3
@@ -92,14 +92,14 @@ resource "aws_vpc_peering_connection_accepter" "peer-accepter" {
 
 # And lastly, add routes in both VPCs to each other
 resource "aws_route" "virginia-to-ohio-routes" {
-  provider = aws.virginia
+  provider                  = aws.virginia
   count                     = length(module.virginia-vpc.private_route_table_ids)
   route_table_id            = module.virginia-vpc.private_route_table_ids[count.index]
   destination_cidr_block    = module.ohio-vpc.vpc_cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.virginia-to-ohio.id
 }
 resource "aws_route" "ohio-to-virginia-routes" {
-  provider = aws.ohio
+  provider                  = aws.ohio
   count                     = length(module.ohio-vpc.private_route_table_ids)
   route_table_id            = module.ohio-vpc.private_route_table_ids[count.index]
   destination_cidr_block    = module.virginia-vpc.vpc_cidr_block
@@ -111,7 +111,7 @@ resource "aws_route" "ohio-to-virginia-routes" {
 # ------------------------------------------------------------------------------
 resource "aws_security_group" "allow-traffic-from-ohio-vpc" {
   name        = "allow-traffic-from-ohio-vpc"
-  provider = aws.virginia
+  provider    = aws.virginia
   description = "Allow all traffic from Ohio private CIDR"
   vpc_id      = module.virginia-vpc.vpc_id
 
@@ -137,7 +137,7 @@ resource "aws_security_group" "allow-traffic-from-ohio-vpc" {
 
 resource "aws_security_group" "allow-traffic-from-virginia-vpc" {
   name        = "allow-traffic-virginia-vpc"
-  provider = aws.ohio
+  provider    = aws.ohio
   description = "Allow all traffic from Virginia private CIDR"
   vpc_id      = module.ohio-vpc.vpc_id
 
