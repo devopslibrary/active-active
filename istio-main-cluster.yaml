@@ -1,0 +1,11 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  values:
+    global:
+      multiCluster:
+        clusterName: virginia
+      network: network1
+      # Use the existing istio-ingressgateway.
+      meshExpansion:
+        enabled: true
